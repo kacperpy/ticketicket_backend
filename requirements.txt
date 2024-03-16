@@ -1,0 +1,7 @@
+Django
+djangorestframework
+celery
+django-celery-beat
+django-celery-results
+django-cors-headers
+redis

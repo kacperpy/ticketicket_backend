@@ -1,7 +1,5 @@
-from rest_framework import status, viewsets, generics
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from ticket.api.serializers import TicketSearchCreateSerializer, TicketSearchReadSerializer
 from ticket.models import TicketSearch
 from ticket.tasks.search_ticket import test_create_ticket_search

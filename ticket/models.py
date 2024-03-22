@@ -24,12 +24,10 @@ class BaseModel(models.Model):
 
 class TicketSearch(BaseModel):
     name = models.CharField(
-        max_length=128,
-        unique=True
+        max_length=128
     )
     url = models.CharField(
-        max_length=128,
-        unique=True
+        max_length=128
     )
     price_threshold = models.DecimalField(
         max_digits=9,

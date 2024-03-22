@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from ticket.models import TicketSearch
+
+admin.site.register(TicketSearch)

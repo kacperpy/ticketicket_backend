@@ -24,6 +24,7 @@ class BaseModel(models.Model):
 
 class TicketSearch(BaseModel):
     name = models.CharField(
+        blank=True,
         max_length=128
     )
     url = models.CharField(

@@ -4,13 +4,26 @@ Helps you find event tickets & more...
 
 ## Getting Started
 
-TODO
+1. Create a virtual python environment
+2. Install requirements.txt
+3. Make migrations
+4. Migrate
+5. Create superuser
+6. Run server 
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+How to run the application for the first time
 
 ```bash
-# Example for Python and Django:
-python -m pip install --upgrade pip
-pip install django
+# Install requirements
+pip install -r requirements.txt
+
+# Make migrations
+python manage.py makemigrations
+# Migrate
+python manage.py migrate
+# Create superuser
+python manage.py createsuperuser
+# Run server
+python manage.py runserver

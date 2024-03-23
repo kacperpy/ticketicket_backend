@@ -10,6 +10,7 @@ Helps you find event tickets & more...
 4. Migrate
 5. Create superuser
 6. Start Django server
+
 7. Start Redis server
 8. Run Celery worker
 9. Run Celery Beat scheduler
@@ -30,6 +31,7 @@ python manage.py migrate
 python manage.py createsuperuser
 # Run server
 python manage.py runserver
+
 # Run Celery worker
 celery -A ticketicket worker -l INFO -P solo
 # Run Celery Beat scheduler

@@ -10,7 +10,6 @@ Helps you find event tickets & more...
 4. Migrate
 5. Create superuser
 6. Start Django server
-
 7. Start Redis server
 8. Run Celery worker
 9. Run Celery Beat scheduler

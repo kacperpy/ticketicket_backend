@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, PERIOD_CHOICES
+from ticket.api.validators.validators_ticket_search import validate_if_url_allowed
+from ticket.core.constants import ALEBILET_URL
 from ticket.models import TicketSearch
 from ticket.core.tools import get_formatted_date
 
@@ -81,6 +83,10 @@ class TicketSearchCreateSerializer(serializers.ModelSerializer):
             'min_availability',
             'periodic_task'
         ]
+
+    def validate_url(self, value):
+        validate_if_url_allowed(ALEBILET_URL, value)
+        return value
 
     def create(self, validated_data):
         periodic_task_data = validated_data.pop('periodic_task')

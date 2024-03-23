@@ -33,7 +33,7 @@ class TicketSearchViewSet(viewsets.ModelViewSet):
         periodic_task.save()
 
         # scheduling a one time task to change the SearchTitle object name
-        tasks.update_search_title.delay(ticket_search.uuid)
+        tasks.update_ticket_search_title.delay(ticket_search.uuid)
 
     def get_serializer_class(self):
         if self.action == 'create':

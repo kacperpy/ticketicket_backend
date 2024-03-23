@@ -1,27 +1,30 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from ticket.api.serializers import TicketSearchCreateSerializer, TicketSearchReadSerializer
+from ticket.constants import GENERAL_EVENT_NAME
 from ticket.models import TicketSearch
-from ticket.tasks.search_ticket import test_create_ticket_search
 
 
 class TicketSearchViewSet(viewsets.ModelViewSet):
-    queryset = TicketSearch.objects.all()
+    queryset = TicketSearch.objects.all().order_by('-created_at')
     permission_classes = [IsAuthenticated]
     lookup_field = 'uuid'
 
-    # for testing celery
     def perform_create(self, serializer):
         request_user = self.request.user
+        periodic_task_name = f"{request_user.username}'s search | {
+            request_user.created_searches.count() + 1}"
 
-        test_create_ticket_search.delay(request_user.id)
-
-        serializer.save(
-            created_by=request_user
+        ticket_search = serializer.save(
+            created_by=request_user,
+            name=GENERAL_EVENT_NAME
         )
+        periodic_task = ticket_search.periodic_task
+        periodic_task.name = periodic_task_name
+        periodic_task.save()
 
     def get_serializer_class(self):
         if self.action == 'create':
             return TicketSearchCreateSerializer
-        elif self.action in ['list', 'retrieve']:
+        else:
             return TicketSearchReadSerializer

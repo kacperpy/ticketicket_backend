@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, PERIOD_CHOICES
 from ticket.models import TicketSearch
-from ticket.tools import get_formatted_date
+from ticket.core.tools import get_formatted_date
 
 
 class IntervalScheduleCreateSerializer(serializers.ModelSerializer):

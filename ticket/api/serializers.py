@@ -1,18 +1,38 @@
 from rest_framework import serializers
-from django_celery_beat.models import PeriodicTask
+from django_celery_beat.models import PeriodicTask, IntervalSchedule, PERIOD_CHOICES
 from ticket.models import TicketSearch
+from ticket.tools import get_formatted_date
 
 
-class PeriodicTaskReadSerializer(serializers.ModelSerializer):
+class IntervalScheduleCreateSerializer(serializers.ModelSerializer):
+    period = serializers.ChoiceField(choices=PERIOD_CHOICES)
+
     class Meta:
-        model = PeriodicTask
+        model = IntervalSchedule
         fields = [
-            'name',
-            'task'
+            'every',
+            'period'
+        ]
+
+    def create(self, validated_data):
+        interval_schedule, created = IntervalSchedule.objects.get_or_create(
+            **validated_data)
+        return interval_schedule
+
+
+class IntervalScheduleReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IntervalSchedule
+        fields = [
+            'every',
+            'period'
         ]
 
 
-class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
+class PeriodicTaskReadSerializer(serializers.ModelSerializer):
+    interval = IntervalScheduleReadSerializer(read_only=True)
+    expires = serializers.SerializerMethodField()
+
     class Meta:
         model = PeriodicTask
         fields = [
@@ -21,6 +41,33 @@ class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
             'interval',
             'expires'
         ]
+
+    def get_expires(self, instance):
+        return get_formatted_date(instance.expires)
+
+
+class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
+    interval = IntervalScheduleCreateSerializer()
+
+    class Meta:
+        model = PeriodicTask
+        fields = [
+            'task',
+            'interval',
+            'expires'
+        ]
+
+    def create(self, validated_data):
+        interval_data = validated_data.pop('interval')
+        interval_serializer = IntervalScheduleCreateSerializer(
+            data=interval_data)
+
+        interval_serializer.is_valid(raise_exception=True)
+        interval = interval_serializer.save()
+        periodic_task = PeriodicTask.objects.create(
+            **validated_data, interval=interval)
+
+        return periodic_task
 
 
 class TicketSearchCreateSerializer(serializers.ModelSerializer):
@@ -35,9 +82,23 @@ class TicketSearchCreateSerializer(serializers.ModelSerializer):
             'periodic_task'
         ]
 
+    def create(self, validated_data):
+        periodic_task_data = validated_data.pop('periodic_task')
+        periodic_task_serializer = PeriodicTaskCreateSerializer(
+            data=periodic_task_data)
+
+        periodic_task_serializer.is_valid(raise_exception=True)
+        periodic_task = periodic_task_serializer.save()
+        ticket_search = TicketSearch.objects.create(
+            **validated_data, periodic_task=periodic_task)
+
+        return ticket_search
+
 
 class TicketSearchReadSerializer(serializers.ModelSerializer):
     periodic_task = PeriodicTaskReadSerializer(read_only=True)
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
 
     class Meta:
         model = TicketSearch
@@ -52,3 +113,9 @@ class TicketSearchReadSerializer(serializers.ModelSerializer):
             'min_availability',
             'periodic_task'
         ]
+
+    def get_created_at(self, instance):
+        return get_formatted_date(instance.created_at)
+
+    def get_updated_at(self, instance):
+        return get_formatted_date(instance.updated_at)

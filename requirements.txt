@@ -5,3 +5,5 @@ django-celery-beat
 django-celery-results
 django-cors-headers
 redis
+requests
+beautifulsoup4

@@ -4,7 +4,7 @@ import re
 
 
 # returns the content of the whole page
-def get_website_content(url):
+def extract_website_content(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -25,7 +25,7 @@ def extract_title(html_content):
 
 
 # returns a list of objects like this: [{availability: integer, price: float}, ...]
-def find_ticket_values(html_content):
+def extract_ticket_values(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     tickets_table = soup.find("table", id="ticket-list")
     ticket_values_list = []
@@ -67,16 +67,19 @@ def find_ticket_values(html_content):
 
     return ticket_values_list
 
+
 # checks if provided tickets have acceptable values and returns the cheapest option
-def check_if_values_accepted(ticket_values_list, desired_values):
+def find_best_value_ticket(ticket_values_list, desired_values):
     best_ticket_values = {
         "availability": desired_values["min_availability"],
         "price": desired_values["price_threshold"]
     }
+    ticket_found = False
 
     for ticket_values in ticket_values_list:
         if ticket_values["availability"] >= best_ticket_values["availability"] and ticket_values["price"] <= best_ticket_values["price"]:
             best_ticket_values["price"] = ticket_values["price"]
             best_ticket_values["availability"] = ticket_values["availability"]
-            return best_ticket_values
-    return None
+            ticket_found = True
+
+    return best_ticket_values if ticket_found else None

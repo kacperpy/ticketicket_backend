@@ -66,3 +66,17 @@ def find_ticket_values(html_content):
                     )
 
     return ticket_values_list
+
+# checks if provided tickets have acceptable values and returns the cheapest option
+def check_if_values_accepted(ticket_values_list, desired_values):
+    best_ticket_values = {
+        "availability": desired_values["min_availability"],
+        "price": desired_values["price_threshold"]
+    }
+
+    for ticket_values in ticket_values_list:
+        if ticket_values["availability"] >= best_ticket_values["availability"] and ticket_values["price"] <= best_ticket_values["price"]:
+            best_ticket_values["price"] = ticket_values["price"]
+            best_ticket_values["availability"] = ticket_values["availability"]
+            return best_ticket_values
+    return None

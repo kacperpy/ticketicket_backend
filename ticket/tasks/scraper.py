@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 
 
+# returns the content of the whole page
 def get_website_content(url):
     try:
         response = requests.get(url)
@@ -15,6 +16,7 @@ def get_website_content(url):
         return None
 
 
+# returns the title text of the scraped site
 def extract_title(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     title_text = soup.title.text if soup.title else "Title tag not found"
@@ -22,10 +24,11 @@ def extract_title(html_content):
     return title_text
 
 
+# returns a list of objects like this: [{availability: integer, price: float}, ...]
 def find_ticket_values(html_content):
     soup = BeautifulSoup(html_content, "html.parser")
     tickets_table = soup.find("table", id="ticket-list")
-    ticket_info = []
+    ticket_values_list = []
 
     if tickets_table:
         number_pattern = re.compile(r'\d+')
@@ -58,8 +61,8 @@ def find_ticket_values(html_content):
                 ) if price_match else None
 
                 if availability is not None and price is not None:
-                    ticket_info.append(
+                    ticket_values_list.append(
                         {"availability": availability, "price": price}
                     )
 
-    return ticket_info
+    return ticket_values_list

@@ -1,6 +1,11 @@
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 import requests
 from bs4 import BeautifulSoup
 import re
+
+from secret import EMAIL_SENDER, EMAIL_SENDER_SECRET_PASSWORD
 
 
 # returns the content of the whole page
@@ -83,3 +88,68 @@ def find_best_value_ticket(ticket_values_list, desired_values):
             ticket_found = True
 
     return best_ticket_values if ticket_found else None
+
+
+def create_email_message(ticket_data):
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                color: #333;
+            }}
+            .container {{
+                background-color: #f2f2f2;
+                border-radius: 5px;
+                padding: 20px;
+            }}
+            h1 {{
+                color: #0275d8;
+            }}
+            .info {{
+                margin-bottom: 12px;
+            }}
+            .highlight {{
+                color: #d9534f;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Ticket Alert: {ticket_data['event_name']}</h1>
+            <p class="info">We found tickets that match your criteria!</p>
+            <p class="info">Desired Price: <span class="highlight">pln{ticket_data['price_threshold']}</span></p>
+            <p class="info">Minimum Availability: <span class="highlight">{ticket_data['min_availability']}</span></p>
+            <p class="info">Price Found: <span class="highlight">pln{ticket_data['price_found']}</span></p>
+            <p class="info">Availability Found: <span class="highlight">{ticket_data['availability_found']}</span></p>
+            <p class="info">Link to Ticket: <span class="highlight">{ticket_data['ticket_url']}</span></p>
+        </div>
+    </body>
+    </html>
+    """
+    return html_message
+
+
+def notify_via_email(recipient, message):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+
+    try:
+        server.login(EMAIL_SENDER, EMAIL_SENDER_SECRET_PASSWORD)
+
+        email = MIMEMultipart('alternative')
+        email['From'] = 'TickeTicket'
+        email['To'] = recipient
+        email['Subject'] = 'GOOD NEWS - Event ticket was found!'
+        email.attach(MIMEText(message, 'html'))
+
+        server.send_message(email)
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+    finally:
+        server.quit()

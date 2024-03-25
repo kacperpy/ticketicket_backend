@@ -27,7 +27,8 @@ class TicketSearchViewSet(viewsets.ModelViewSet):
             [
                 str(ticket_search.price_threshold),
                 ticket_search.url,
-                ticket_search.min_availability
+                ticket_search.min_availability,
+                periodic_task.id
             ]
         )
         periodic_task.save()

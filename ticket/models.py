@@ -28,7 +28,7 @@ class TicketSearch(BaseModel):
         max_length=128
     )
     url = models.CharField(
-        max_length=128
+        max_length=256
     )
     price_threshold = models.DecimalField(
         max_digits=9,

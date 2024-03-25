@@ -106,3 +106,4 @@ venv.bak/
 
 */migrations/*
 !*/migrations/__init__.py
+/secret.py

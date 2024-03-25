@@ -35,7 +35,7 @@ class TicketSearch(BaseModel):
         decimal_places=2
     )
     min_availability = models.IntegerField()
-    periodic_task = models.ForeignKey(
+    periodic_task = models.OneToOneField(
         PeriodicTask,
         related_name='ticket_searched',
         on_delete=models.SET_NULL,

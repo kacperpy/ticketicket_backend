@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, PERIOD_CHOICES
 from ticket.api.validators.validators_ticket_search import validate_if_url_allowed
-from ticket.core.constants import ALEBILET_URL
+from ticket.core.constants import ALEBILET_URL, TICKET_SCRAPER_TASK
 from ticket.models import TicketSearch
 from ticket.core.tools import get_formatted_date
 
@@ -45,7 +45,7 @@ class PeriodicTaskReadSerializer(serializers.ModelSerializer):
         ]
 
     def get_expires(self, instance):
-        return get_formatted_date(instance.expires)
+        return get_formatted_date(instance.expires) if instance.expires is not None else None
 
 
 class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
@@ -54,9 +54,8 @@ class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PeriodicTask
         fields = [
-            'task',
-            'interval',
-            'expires'
+            'expires',
+            'interval'
         ]
 
     def create(self, validated_data):
@@ -67,7 +66,10 @@ class PeriodicTaskCreateSerializer(serializers.ModelSerializer):
         interval_serializer.is_valid(raise_exception=True)
         interval = interval_serializer.save()
         periodic_task = PeriodicTask.objects.create(
-            **validated_data, interval=interval)
+            **validated_data,
+            interval=interval,
+            task=TICKET_SCRAPER_TASK
+        )
 
         return periodic_task
 

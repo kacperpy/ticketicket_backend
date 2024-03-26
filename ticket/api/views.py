@@ -25,10 +25,7 @@ class TicketSearchViewSet(viewsets.ModelViewSet):
         periodic_task.name = periodic_task_name
         periodic_task.args = json.dumps(
             [
-                str(ticket_search.price_threshold),
-                ticket_search.url,
-                ticket_search.min_availability,
-                periodic_task.id
+                ticket_search.id
             ]
         )
         periodic_task.save()

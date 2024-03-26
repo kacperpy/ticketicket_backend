@@ -122,9 +122,9 @@ def create_email_message(ticket_data):
         <div class="container">
             <h1>Ticket Alert: {ticket_data['event_name']}</h1>
             <p class="info">We found tickets that match your criteria!</p>
-            <p class="info">Desired Price: <span class="highlight">pln{ticket_data['price_threshold']}</span></p>
+            <p class="info">Desired Price: <span class="highlight">PLN {ticket_data['price_threshold']}</span></p>
             <p class="info">Minimum Availability: <span class="highlight">{ticket_data['min_availability']}</span></p>
-            <p class="info">Price Found: <span class="highlight">pln{ticket_data['price_found']}</span></p>
+            <p class="info">Price Found: <span class="highlight">PLN {ticket_data['price_found']}</span></p>
             <p class="info">Availability Found: <span class="highlight">{ticket_data['availability_found']}</span></p>
             <p class="info">Link to Ticket: <span class="highlight">{ticket_data['ticket_url']}</span></p>
         </div>
